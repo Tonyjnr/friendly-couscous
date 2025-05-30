@@ -8,6 +8,9 @@ import FocusMode from './components/FocusMode';
 import Analytics from './components/Analytics';
 import CourseManagement from './components/CourseManagement';
 import Navigation from './components/Navigation';
+import ThemeToggle from './components/ThemeToggle';
+import { TaskProvider } from './context/TaskContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 function App() {
   const [currentView, setCurrentView] = useState('viewer');
@@ -47,53 +50,60 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {currentView !== 'viewer' && (
-        <div className="flex items-center justify-between p-4 bg-white shadow-md">
-          <button
-            onClick={() => setCurrentView('viewer')}
-            className="px-4 py-2 font-medium text-blue-600 border border-blue-600 rounded hover:bg-blue-50"
+    <ThemeProvider>
+      <TaskProvider>
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+          {currentView !== 'viewer' && (
+            <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 shadow-md transition-colors duration-200">
+              <button
+                onClick={() => setCurrentView('viewer')}
+                className="px-4 py-2 font-medium text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-400 rounded hover:bg-blue-50 dark:hover:bg-blue-900 dark:hover:bg-opacity-20 transition-colors duration-200"
+              >
+                Back to Wireframe List
+              </button>
+              <div className="flex items-center">
+                <span className="mr-2 font-medium text-gray-800 dark:text-gray-200">View Mode:</span>
+                <button
+                  onClick={toggleDeviceView}
+                  className={`px-4 py-2 font-medium border rounded transition-colors duration-200 ${
+                    mobileView
+                      ? 'bg-blue-600 text-white'
+                      : 'text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400'
+                  }`}
+                >
+                  {mobileView ? 'Mobile View' : 'Desktop View'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div 
+            className={`transition-all duration-300 ${
+              mobileView && currentView !== 'viewer' 
+                ? 'max-w-sm mx-auto' 
+                : 'container mx-auto'
+            }`}
           >
-            Back to Wireframe List
-          </button>
-          <div className="flex items-center">
-            <span className="mr-2 font-medium">View Mode:</span>
-            <button
-              onClick={toggleDeviceView}
-              className={`px-4 py-2 font-medium border rounded ${
-                mobileView
-                  ? 'bg-blue-600 text-white'
-                  : 'text-blue-600 border-blue-600'
-              }`}
-            >
-              {mobileView ? 'Mobile View' : 'Desktop View'}
-            </button>
+            {renderContent()}
           </div>
-        </div>
-      )}
 
-      <div 
-        className={`transition-all duration-300 ${
-          mobileView && currentView !== 'viewer' 
-            ? 'max-w-sm mx-auto' 
-            : 'container mx-auto'
-        }`}
-      >
-        {renderContent()}
-      </div>
-
-      {currentView !== 'viewer' && mobileView && (
-        <div className="fixed bottom-0 left-0 right-0">
-          <Navigation isMobile={true} onViewChange={handleViewChange} currentView={currentView} />
+          {currentView !== 'viewer' && mobileView && (
+            <div className="fixed bottom-0 left-0 right-0">
+              <Navigation isMobile={true} onViewChange={handleViewChange} currentView={currentView} />
+            </div>
+          )}
+          
+          {currentView !== 'viewer' && !mobileView && (
+            <div className="fixed top-0 left-0 bottom-0 w-16 bg-white dark:bg-gray-800 shadow-md transition-colors duration-200">
+              <Navigation isMobile={false} onViewChange={handleViewChange} currentView={currentView} />
+            </div>
+          )}
+          
+          {/* Theme toggle button */}
+          {currentView !== 'viewer' && <ThemeToggle />}
         </div>
-      )}
-      
-      {currentView !== 'viewer' && !mobileView && (
-        <div className="fixed top-0 left-0 bottom-0 w-16 bg-white shadow-md">
-          <Navigation isMobile={false} onViewChange={handleViewChange} currentView={currentView} />
-        </div>
-      )}
-    </div>
+      </TaskProvider>
+    </ThemeProvider>
   );
 }
 
